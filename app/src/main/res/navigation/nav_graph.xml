@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.github.mhelmi.unsplashphotos.PhotoListFragment"
+        android:name="com.github.mhelmi.unsplashphotos.ui.photos.list.PhotoListFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.github.mhelmi.unsplashphotos.PhotoDetailsFragment"
+        android:name="com.github.mhelmi.unsplashphotos.ui.photos.details.PhotoDetailsFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 
