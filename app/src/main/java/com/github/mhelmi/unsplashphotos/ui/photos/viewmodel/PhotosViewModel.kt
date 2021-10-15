@@ -14,6 +14,7 @@ import com.github.mhelmi.unsplashphotos.domain.photos.usecase.GetPhotosUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +45,7 @@ class PhotosViewModel @Inject constructor(
           if (page == PhotosConst.START_PAGE) UiState.Loading() else UiState.LoadMore()
       }
       .map {
-        if (it.isEmpty()) isLastPage = true
+        if (page != PhotosConst.START_PAGE && it.isEmpty()) isLastPage = true
         nextPage++
         photosList.addAll(it)
         photosList.toList()
@@ -54,6 +55,7 @@ class PhotosViewModel @Inject constructor(
       }
       .onEach { _photoListState.value = it }
       .catch {
+        Timber.e(it)
         if (photosList.isEmpty()) {
           _photoListState.value = UiState.Error(it.message)
         } else {
