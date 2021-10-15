@@ -6,7 +6,11 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2833333333333333" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.3651041666666667" />
         <entry key="app/src/main/res/layout/fragment_first.xml" value="0.3651041666666667" />
+        <entry key="app/src/main/res/layout/fragment_photo_list.xml" value="0.3194444444444444" />
         <entry key="app/src/main/res/layout/fragment_second.xml" value="0.3651041666666667" />
+        <entry key="app/src/main/res/layout/item_ad.xml" value="0.365625" />
+        <entry key="app/src/main/res/layout/item_photo.xml" value="0.335" />
+        <entry key="app/src/main/res/menu/menu_main.xml" value="0.11822916666666666" />
       </map>
     </option>
   </component>
