@@ -55,6 +55,10 @@ ext {
   def junit = "4.13.2"
   def junit_android_test = "1.1.2"
   def espresso_core = "3.3.0"
+  def mockito = "3.8.0"
+  def mockitoKotlin = "4.0.0"
+  def coroutinesTest = "1.4.2"
+  def coreTesting = "2.1.0"
 
   androidCore = [
     "androidx.appcompat:appcompat:$appcompat",
@@ -148,11 +152,17 @@ ext {
   ]
 
   testImplementationGroup = [
-    "junit:junit:$junit"
+    "junit:junit:$junit",
+    "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesTest",
+    "androidx.arch.core:core-testing:$coreTesting",
+    "org.mockito:mockito-core:$mockito",
+    "org.mockito:mockito-inline:$mockito",
+    "org.mockito.kotlin:mockito-kotlin:$mockitoKotlin",
   ]
 
   androidTestImplementationGroup = [
     "androidx.test.ext:junit:$junit_android_test",
-    "androidx.test.espresso:espresso-core:$espresso_core"
+    "androidx.test.espresso:espresso-core:$espresso_core",
+    "org.mockito:mockito-android:$mockito",
   ]
 }
