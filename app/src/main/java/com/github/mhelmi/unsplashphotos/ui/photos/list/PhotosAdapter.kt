@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.github.mhelmi.unsplashphotos.databinding.ItemAdBinding
 import com.github.mhelmi.unsplashphotos.databinding.ItemPhotoBinding
 import com.github.mhelmi.unsplashphotos.domain.photos.model.Ad
@@ -45,12 +46,13 @@ class PhotosAdapter(
     private val binding: ItemPhotoBinding
   ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bindItem(photo: Photo) {
-      Glide.with(binding.root)
+    fun bindItem(photo: Photo) = binding.apply {
+      tvAuthorName.text = photo.author
+      Glide.with(root)
         .load(photo.photoUrl)
-        .into(binding.ivPhoto)
+        .into(ivPhoto)
 
-      binding.root.setOnClickListener {
+      root.setOnClickListener {
         listener.onPhotoClick(bindingAdapterPosition, photo)
       }
     }
@@ -60,12 +62,13 @@ class PhotosAdapter(
     private val binding: ItemAdBinding
   ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bindItem(ad: Ad) {
-      Glide.with(binding.root)
+    fun bindItem(ad: Ad) = binding.apply {
+      Glide.with(root)
         .load(ad.imageRes)
-        .into(binding.ivAdPhoto)
+        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+        .into(ivAdPhoto)
 
-      binding.root.setOnClickListener {
+      root.setOnClickListener {
         listener.onAdClick(bindingAdapterPosition, ad)
       }
     }
