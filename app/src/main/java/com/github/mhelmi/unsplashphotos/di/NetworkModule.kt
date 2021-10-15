@@ -1,6 +1,7 @@
 package com.github.mhelmi.unsplashphotos.di
 
 import com.github.mhelmi.unsplashphotos.BuildConfig
+import com.github.mhelmi.unsplashphotos.common.retrofit.SynchronousCallAdapterFactory
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -8,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -26,10 +28,18 @@ object NetworkModule {
   @Singleton
   fun provideBaseUrl(): String = BuildConfig.BASE_URL
 
+  @Provides
+  fun provideLoggingInterceptor() =
+    HttpLoggingInterceptor().apply {
+      level =
+        if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+    }
+
   @MainClient
   @Provides
   @Singleton
-  fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+  fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor) = OkHttpClient.Builder()
+    .addInterceptor(httpLoggingInterceptor)
     .callTimeout(CALL_TIMEOUT, TimeUnit.SECONDS)
     .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
     .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
@@ -53,9 +63,10 @@ object NetworkModule {
   fun provideRetrofit(
     @MainClient baseUrl: String,
     @MainClient okHttpClient: OkHttpClient,
-    @MainClient gsonConverterFactory: GsonConverterFactory
+    @MainClient gsonConverterFactory: GsonConverterFactory,
   ): Retrofit = Retrofit.Builder()
     .baseUrl(baseUrl)
+    .addCallAdapterFactory(SynchronousCallAdapterFactory())
     .addConverterFactory(gsonConverterFactory)
     .client(okHttpClient)
     .build()
