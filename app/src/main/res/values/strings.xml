@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">Unsplash Photos</string>
+  <string name="app_name">Unsplash Photos</string>
 
-    <string name="fragment_photo_list_label">Unsplash Photo List</string>
-    <string name="fragment_photo_details_label">Photo Details</string>
-    <string name="photo">Photo</string>
-    <string name="try_again">Try again</string>
-    <string name="server_error">Ops, We can\'t Load data!</string>
+  <string name="fragment_photo_list_label">Unsplash Photo List</string>
+  <string name="fragment_photo_details_label">Photo Details</string>
+  <string name="photo">Photo</string>
+  <string name="try_again">Try again</string>
+  <string name="server_error">Ops, We can\'t Load data!</string>
 
 </resources>

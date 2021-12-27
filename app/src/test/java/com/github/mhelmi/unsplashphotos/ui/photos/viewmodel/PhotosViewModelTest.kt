@@ -1,7 +1,6 @@
 package com.github.mhelmi.unsplashphotos.ui.photos.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import com.github.mhelmi.unsplashphotos.common.state.UiState
 import com.github.mhelmi.unsplashphotos.domain.photos.model.Photo
 import com.github.mhelmi.unsplashphotos.domain.photos.model.PhotosConst
@@ -9,14 +8,14 @@ import com.github.mhelmi.unsplashphotos.domain.photos.usecase.GetPhotosUseCase
 import com.github.mhelmi.unsplashphotos.utils.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsInstanceOf.instanceOf
 import org.junit.*
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
@@ -38,12 +37,7 @@ class PhotosViewModelTest {
   @Mock
   lateinit var getPhotosUseCase: GetPhotosUseCase
 
-  @Mock
-  lateinit var photosStateObserver: Observer<UiState<List<Any>>>
-
-  @Captor
-  lateinit var photosStateCaptor: ArgumentCaptor<UiState<List<Any>>>
-
+  private val testResults: MutableList<UiState<List<Any>>> = mutableListOf()
 
   private val successResponse = listOf(Photo("1", "Picasso", "http://photourl.com/test.png"))
   private val successWithAdsResponse = listOf(
@@ -56,35 +50,32 @@ class PhotosViewModelTest {
   private val emptyResponse = emptyList<Photo>()
 
   @Before
-  fun setUp() {
+  fun beforeEachTest() {
     photosViewModel = PhotosViewModel(getPhotosUseCase, testDispatcher)
   }
 
   @After
-  fun tearDown() {
-    photosViewModel.photoListState.removeObserver(photosStateObserver)
+  fun afterEachTest() {
+    testResults.clear()
     testDispatcher.cleanupTestCoroutines()
   }
 
   @Test
   fun `when loadPhotos() and getPhotosUseCase() return not empty list then return success ui state`() =
     runBlockingTest {
-
       Mockito.`when`(getPhotosUseCase(PhotosConst.START_PAGE, PhotosConst.PAGE_SIZE))
         .thenReturn(flowOf(successResponse))
 
-      photosViewModel.photoListState.observeForever(photosStateObserver)
+      val job = launch {
+        photosViewModel.photoListState.toList(testResults)
+      }
       photosViewModel.loadPhotos()
-
-      Mockito.verify(photosStateObserver, Mockito.times(3))
-        .onChanged(photosStateCaptor.capture())
-
-      val values = photosStateCaptor.allValues
       /* For testing only emit Error at first because loadPhotos called in init before preparing our test */
-      assertThat(values[0], instanceOf(UiState.Error::class.java))
-      assertThat(values[1], instanceOf(UiState.Loading::class.java))
-      assertThat(values[2], instanceOf(UiState.Success::class.java))
-      Assert.assertEquals(successResponse, (values[2] as UiState.Success).data)
+      assertThat(testResults[0], instanceOf(UiState.Error::class.java))
+      assertThat(testResults[1], instanceOf(UiState.Loading::class.java))
+      assertThat(testResults[2], instanceOf(UiState.Success::class.java))
+      Assert.assertEquals(successResponse, (testResults[2] as UiState.Success).data)
+      job.cancel()
     }
 
   @Test
@@ -93,21 +84,20 @@ class PhotosViewModelTest {
       Mockito.`when`(getPhotosUseCase(PhotosConst.START_PAGE, PhotosConst.PAGE_SIZE))
         .thenReturn(flowOf(successWithAdsResponse))
 
-      photosViewModel.photoListState.observeForever(photosStateObserver)
+      val job = launch {
+        photosViewModel.photoListState.toList(testResults)
+      }
       photosViewModel.loadPhotos()
 
-      Mockito.verify(photosStateObserver, Mockito.times(3))
-        .onChanged(photosStateCaptor.capture())
-
-      val values = photosStateCaptor.allValues
       /* For testing only emit Error at first because loadPhotos called in init before preparing our test */
-      assertThat(values[0], instanceOf(UiState.Error::class.java))
-      assertThat(values[1], instanceOf(UiState.Loading::class.java))
-      assertThat(values[2], instanceOf(UiState.Success::class.java))
+      assertThat(testResults[0], instanceOf(UiState.Error::class.java))
+      assertThat(testResults[1], instanceOf(UiState.Loading::class.java))
+      assertThat(testResults[2], instanceOf(UiState.Success::class.java))
       Assert.assertEquals(
         successWithAdsResponse.count() + 1,
-        (values[2] as UiState.Success).data.count()
+        (testResults[2] as UiState.Success).data.count()
       )
+      job.cancel()
     }
 
   @Test
@@ -116,17 +106,16 @@ class PhotosViewModelTest {
       Mockito.`when`(getPhotosUseCase(PhotosConst.START_PAGE, PhotosConst.PAGE_SIZE))
         .thenReturn(flowOf(emptyResponse))
 
-      photosViewModel.photoListState.observeForever(photosStateObserver)
+      val job = launch {
+        photosViewModel.photoListState.toList(testResults)
+      }
       photosViewModel.loadPhotos()
 
-      Mockito.verify(photosStateObserver, Mockito.times(3))
-        .onChanged(photosStateCaptor.capture())
-
-      val values = photosStateCaptor.allValues
       /* For testing only emit Error at first because loadPhotos called in init before preparing our test */
-      assertThat(values[0], instanceOf(UiState.Error::class.java))
-      assertThat(values[1], instanceOf(UiState.Loading::class.java))
-      assertThat(values[2], instanceOf(UiState.Empty::class.java))
+      assertThat(testResults[0], instanceOf(UiState.Error::class.java))
+      assertThat(testResults[1], instanceOf(UiState.Loading::class.java))
+      assertThat(testResults[2], instanceOf(UiState.Empty::class.java))
+      job.cancel()
     }
 
   @Test

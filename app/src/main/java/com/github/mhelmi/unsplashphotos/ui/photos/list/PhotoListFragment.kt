@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +21,10 @@ import com.github.mhelmi.unsplashphotos.domain.photos.model.Ad
 import com.github.mhelmi.unsplashphotos.domain.photos.model.Photo
 import com.github.mhelmi.unsplashphotos.domain.photos.model.PhotosConst
 import com.github.mhelmi.unsplashphotos.ui.photos.viewmodel.PhotosViewModel
+import com.github.mhelmi.unsplashphotos.ui.photos.viewmodel.PhotosViewModel.PhotosEvent.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class PhotoListFragment : Fragment(), PhotosAdapter.PhotosClickListener {
@@ -53,17 +59,6 @@ class PhotoListFragment : Fragment(), PhotosAdapter.PhotosClickListener {
     }
   }
 
-  private fun observeState() {
-    viewModel.photoListState.observe(viewLifecycleOwner) {
-      showLoading(it is UiState.Loading || it is UiState.LoadMore)
-      showEmptyView(it is UiState.Empty)
-      when (it) {
-        is UiState.Success -> photosAdapter.submitList(it.data)
-        else -> Unit
-      }
-    }
-  }
-
   private fun setupPhotosRecyclerView() = binding?.rvPhotos?.apply {
     layoutManager = LinearLayoutManager(context).also { linearLayoutManager = it }
     setHasFixedSize(true)
@@ -77,6 +72,38 @@ class PhotoListFragment : Fragment(), PhotosAdapter.PhotosClickListener {
     })
   }
 
+  /**
+   * Check this link to understand why we need repeatOnLifecycle function and how to use it.
+   * https://medium.com/androiddevelopers/a-safer-way-to-collect-flows-from-android-uis-23080b1f8bda
+   */
+  private fun observeState() {
+    with(viewModel) {
+      viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+          launch { photoListState.collect(::handlePhotosUiState) }
+          launch { events.collect(::handlePhotoEvents) }
+        }
+      }
+    }
+  }
+
+  private fun handlePhotosUiState(state: UiState<List<Any>>) {
+    showLoading(state is UiState.Loading || state is UiState.LoadMore)
+    showEmptyView(state is UiState.Empty)
+    when (state) {
+      is UiState.Success -> photosAdapter.submitList(state.data)
+      else -> Unit
+    }
+  }
+
+  private fun handlePhotoEvents(event: PhotosViewModel.PhotosEvent) {
+    when (event) {
+      is OpenPhotoDetails -> navController.navigate(
+        PhotoListFragmentDirections.actionPhotoListFragmentToPhotoDetailsFragment(event.photo)
+      )
+    }
+  }
+
   private fun showLoading(isLoading: Boolean) = binding?.progressBarLoading?.apply {
     isVisible = isLoading
   }
@@ -85,12 +112,8 @@ class PhotoListFragment : Fragment(), PhotosAdapter.PhotosClickListener {
     this.isVisible = isVisible
   }
 
-  override fun onPhotoClick(position: Int, photo: Photo) {
-    navController.navigate(
-      PhotoListFragmentDirections.actionPhotoListFragmentToPhotoDetailsFragment(
-        photo
-      )
-    )
+  override fun onPhotoClicked(position: Int, photo: Photo) {
+    viewModel.onPhotoClicked(photo)
   }
 
   override fun onAdClick(position: Int, ad: Ad) {
@@ -98,7 +121,7 @@ class PhotoListFragment : Fragment(), PhotosAdapter.PhotosClickListener {
   }
 
   override fun onDestroyView() {
-    super.onDestroyView()
     binding = null
+    super.onDestroyView()
   }
 }

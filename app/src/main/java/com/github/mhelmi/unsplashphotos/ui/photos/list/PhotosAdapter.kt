@@ -53,7 +53,7 @@ class PhotosAdapter(
         .into(ivPhoto)
 
       root.setOnClickListener {
-        listener.onPhotoClick(bindingAdapterPosition, photo)
+        listener.onPhotoClicked(bindingAdapterPosition, photo)
       }
     }
   }
@@ -91,7 +91,7 @@ class PhotosAdapter(
   }
 
   interface PhotosClickListener {
-    fun onPhotoClick(position: Int, photo: Photo)
+    fun onPhotoClicked(position: Int, photo: Photo)
     fun onAdClick(position: Int, ad: Ad)
   }
 

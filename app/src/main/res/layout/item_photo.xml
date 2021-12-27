@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  app:cardBackgroundColor="@color/white"
+  app:cardCornerRadius="@dimen/_8dp"
+  app:cardElevation="@dimen/_2dp"
+  app:cardPreventCornerOverlap="true"
+  app:cardUseCompatPadding="true">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="@dimen/_8dp"
-    app:cardElevation="@dimen/_2dp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <ImageView
+      android:id="@+id/iv_photo"
+      android:layout_width="0dp"
+      android:layout_height="@dimen/_180dp"
+      android:contentDescription="@string/photo"
+      android:scaleType="centerCrop"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:src="@tools:sample/backgrounds/scenic" />
 
-        <ImageView
-            android:id="@+id/iv_photo"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_180dp"
-            android:contentDescription="@string/photo"
-            android:scaleType="centerCrop"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/backgrounds/scenic" />
+    <TextView
+      android:id="@+id/tv_author_name"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:paddingStart="@dimen/_8dp"
+      android:paddingTop="@dimen/_5dp"
+      android:paddingEnd="@dimen/_8dp"
+      android:paddingBottom="@dimen/_5dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/iv_photo"
+      tools:text="Author Name" />
 
-        <TextView
-            android:id="@+id/tv_author_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingStart="@dimen/_8dp"
-            android:paddingTop="@dimen/_5dp"
-            android:paddingEnd="@dimen/_8dp"
-            android:paddingBottom="@dimen/_5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_photo"
-            tools:text="Author Name" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
